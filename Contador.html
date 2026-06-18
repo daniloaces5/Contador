@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a1a">
+<title>Estoque de Espetos</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;background:#1a1a1a}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#f0ede8;font-size:13px;overscroll-behavior:none}
+
+  /* ── TABS ── */
+  #tabs{display:flex;background:#111;border-bottom:1px solid #2a2a2a;flex-shrink:0}
+  .tab{flex:1;padding:10px 4px;text-align:center;font-size:11px;font-weight:500;color:#666;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:color 0.15s}
+  .tab.active{color:#E8642A;border-bottom:2px solid #E8642A}
+
+  /* ── LAYOUT ── */
+  #shell{display:flex;flex-direction:column;height:100vh}
+  .header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#111;flex-shrink:0;border-bottom:1px solid #222}
+  .header-title{font-size:15px;font-weight:600;color:#E8642A;letter-spacing:0.3px}
+  .header-date{font-size:12px;color:#666}
+
+  /* ── PAGES ── */
+  .page{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px}
+  .page.active{display:block}
+
+  /* ── ESTOQUE PAGE: 2 col grid ── */
+  #page-estoque .cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .section-label{font-size:10px;font-weight:600;color:#E8642A;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #2d2d2d}
+
+  /* ── ESPETO ROW ── */
+  .espeto-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid #252525}
+  .espeto-name{font-size:11.5px;color:#ccc;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:4px}
+  .has-pkg .espeto-name{color:#E8A070}
+  .counter-wrap{display:flex;align-items:center;gap:2px;flex-shrink:0}
+  .cval{min-width:28px;text-align:center;font-size:13px;font-weight:600;color:#f0ede8;background:#2a2a2a;border-radius:4px;padding:1px 4px}
+  .cbtn{width:22px;height:22px;border:none;border-radius:4px;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none}
+  .cbtn-m{background:#2d2d2d;color:#aaa}
+  .cbtn-p{background:#E8642A;color:#fff}
+  .cbtn:active{transform:scale(0.88)}
+
+  /* pkg badge inline */
+  .pkg-badge{font-size:9px;color:#777;margin-left:2px;white-space:nowrap}
+
+  /* ── PACOTES PAGE ── */
+  #page-pacotes .intro{font-size:12px;color:#666;margin-bottom:10px;line-height:1.5}
+  .pkg-card{background:#222;border-radius:8px;padding:8px 10px;margin-bottom:8px;border:0.5px solid #2d2d2d}
+  .pkg-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .pkg-espeto-name{font-size:13px;font-weight:500;color:#f0ede8}
+  .pkg-toggle{font-size:11px;color:#E8642A;background:none;border:none;cursor:pointer;padding:0}
+  .pkg-fields{display:flex;align-items:center;gap:6px}
+  .pkg-field-group{display:flex;flex-direction:column;gap:2px}
+  .pkg-field-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.5px}
+  .pkg-input{background:#2d2d2d;border:none;color:#f0ede8;border-radius:5px;padding:4px 6px;font-size:13px;width:52px;text-align:center;-webkit-appearance:none}
+  .pkg-input:focus{outline:1px solid #E8642A}
+  .pkg-eq{font-size:12px;color:#555;align-self:center;margin-top:12px}
+  .pkg-result{font-size:13px;font-weight:600;color:#E8A070;align-self:center;margin-top:12px}
+  .pkg-disabled{opacity:0.4}
+
+  /* ── BOTTOM BAR ── */
+  #bottom-bar{padding:8px 12px;background:#111;border-top:1px solid #222;flex-shrink:0;display:flex;gap:8px}
+  .btn-copy{flex:1;background:#E8642A;border:none;color:#fff;font-size:13px;font-weight:600;border-radius:8px;padding:11px;cursor:pointer;letter-spacing:0.3px}
+  .btn-copy:active{transform:scale(0.97);background:#cc5520}
+  .btn-reset{background:#2a2a2a;border:none;color:#888;font-size:13px;font-weight:500;border-radius:8px;padding:11px 14px;cursor:pointer}
+  .btn-reset:active{transform:scale(0.97)}
+
+  /* ── TOAST ── */
+  #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#E8642A;color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:all 0.25s;pointer-events:none;z-index:999;white-space:nowrap}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* scrollbar */
+  .page::-webkit-scrollbar{width:3px}
+  .page::-webkit-scrollbar-track{background:transparent}
+  .page::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="shell">
+
+  <div class="header">
+    <span class="header-title">🔥 Estoque de Espetos</span>
+    <span class="header-date" id="hdr-date"></span>
+  </div>
+
+  <div id="tabs">
+    <div class="tab active" data-page="estoque">Estoque</div>
+    <div class="tab" data-page="pacotes">Pacotes</div>
+  </div>
+
+  <!-- PAGE: ESTOQUE -->
+  <div class="page active" id="page-estoque">
+    <div class="cols">
+      <div>
+        <div class="section-label">Tradicionais</div>
+        <div id="list-trad"></div>
+      </div>
+      <div>
+        <div class="section-label">Arretados</div>
+        <div id="list-arre"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: PACOTES -->
+  <div class="page" id="page-pacotes">
+    <p class="intro">Ative e configure o tamanho do pacote para cada espeto. Na aba Estoque, o contador de pacotes vai calcular as unidades automaticamente.</p>
+    <div id="pkg-list"></div>
+  </div>
+
+  <div id="bottom-bar">
+    <button class="btn-reset" onclick="resetAll()">Zerar</button>
+    <button class="btn-copy" onclick="copyStock()">📋 Copiar estoque</button>
+  </div>
+</div>
+
+<div id="toast" id="toast">Copiado!</div>
+
+<script>
+const TRADICIONAIS = [
+  "Contra","Cupim","Kafta","Frango C/bacon","Coração","Tulipa",
+  "Filé de Frango","Linguiça Apimentada","Linguiça S/pimenta",
+  "Queijo Coalho","Queijo Provolone","Pão de Alho"
+];
+const ARRETADOS = [
+  "Picanha P","Contra Nobre","Medalhão de Picanha","Medalhão Frango",
+  "Fraldinha Pacu","Fraldinha Tradicional","Lombo Suíno","Bananinha",
+  "Filé Mignon","Romeu e Julieta"
+];
+
+// State
+let units = {};      // name -> manual unit count
+let pkgCounts = {};  // name -> package count
+let pkgSizes = {};   // name -> units per package (0 = disabled)
+let pkgEnabled = {}; // name -> bool
+
+const ALL = [...TRADICIONAIS, ...ARRETADOS];
+ALL.forEach(n => {
+  units[n] = 0;
+  pkgCounts[n] = 0;
+  pkgSizes[n] = 6;
+  pkgEnabled[n] = false;
+});
+
+// Date
+function fmtDate() {
+  const d = new Date();
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+document.getElementById('hdr-date').textContent = fmtDate();
+
+// Total units for an espeto
+function total(name) {
+  const pkgU = pkgEnabled[name] ? pkgCounts[name] * pkgSizes[name] : 0;
+  return units[name] + pkgU;
+}
+
+// ── RENDER ESTOQUE ──
+function renderList(arr, containerId) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  arr.forEach(name => {
+    const hasPkg = pkgEnabled[name];
+    const row = document.createElement('div');
+    row.className = 'espeto-row' + (hasPkg ? ' has-pkg' : '');
+    row.id = 'row-' + CSS.escape(name);
+
+    // Unit counter (manual)
+    let html = `<span class="espeto-name" title="${name}">${name}</span>`;
+
+    // Pkg counter (only if enabled)
+    if (hasPkg) {
+      html += `
+        <div class="counter-wrap" style="margin-right:4px">
+          <button class="cbtn cbtn-m" onclick="changePkg('${name}',-1)">−</button>
+          <span class="cval pkg-cval" id="pkgval-${name}">${pkgCounts[name]}</span>
+          <button class="cbtn cbtn-p" onclick="changePkg('${name}',1)" style="background:#7a3a10">+</button>
+        </div>
+        <span class="pkg-badge" id="pkgbadge-${name}">${pkgSizes[name]}un</span>
+      `;
+    }
+
+    html += `
+      <div class="counter-wrap" style="margin-left:${hasPkg?'4px':'0'}">
+        <button class="cbtn cbtn-m" onclick="changeUnit('${name}',-1)">−</button>
+        <span class="cval" id="uval-${name}">${total(name)}</span>
+        <button class="cbtn cbtn-p" onclick="changeUnit('${name}',1)">+</button>
+      </div>`;
+
+    row.innerHTML = html;
+    el.appendChild(row);
+  });
+}
+
+function changeUnit(name, d) {
+  units[name] = Math.max(0, units[name] + d);
+  refreshRow(name);
+}
+
+function changePkg(name, d) {
+  pkgCounts[name] = Math.max(0, pkgCounts[name] + d);
+  refreshRow(name);
+}
+
+function refreshRow(name) {
+  const uv = document.getElementById('uval-' + name);
+  if (uv) uv.textContent = total(name);
+  const pv = document.getElementById('pkgval-' + name);
+  if (pv) pv.textContent = pkgCounts[name];
+}
+
+// ── RENDER PACOTES ──
+function renderPkgs() {
+  const el = document.getElementById('pkg-list');
+  el.innerHTML = '';
+  ALL.forEach(name => {
+    const enabled = pkgEnabled[name];
+    const card = document.createElement('div');
+    card.className = 'pkg-card' + (enabled ? '' : ' pkg-disabled');
+    card.innerHTML = `
+      <div class="pkg-card-header">
+        <span class="pkg-espeto-name">${name}</span>
+        <button class="pkg-toggle" onclick="togglePkg('${name}')">${enabled ? '✓ Ativo' : 'Ativar'}</button>
+      </div>
+      <div class="pkg-fields" style="${enabled?'':'pointer-events:none;opacity:0.4'}">
+        <div class="pkg-field-group">
+          <span class="pkg-field-label">Tamanho do pacote</span>
+          <input class="pkg-input" type="number" min="1" value="${pkgSizes[name]}"
+            onchange="updatePkgSize('${name}',+this.value)" id="psize-${name}">
+        </div>
+        <span class="pkg-eq">un/pkg</span>
+        <div class="pkg-field-group" style="margin-left:10px">
+          <span class="pkg-field-label">Pacotes</span>
+          <input class="pkg-input" type="number" min="0" value="${pkgCounts[name]}"
+            onchange="updatePkgCount('${name}',+this.value)" id="pcount-${name}">
+        </div>
+        <span class="pkg-eq">=</span>
+        <span class="pkg-result" id="pkgres-${name}">${pkgCounts[name]*pkgSizes[name]}un</span>
+      </div>`;
+    el.appendChild(card);
+  });
+}
+
+function togglePkg(name) {
+  pkgEnabled[name] = !pkgEnabled[name];
+  if (!pkgEnabled[name]) pkgCounts[name] = 0;
+  renderAll();
+}
+
+function updatePkgSize(name, val) {
+  pkgSizes[name] = Math.max(1, val || 1);
+  const res = document.getElementById('pkgres-' + name);
+  if (res) res.textContent = pkgCounts[name] * pkgSizes[name] + 'un';
+  refreshRow(name);
+}
+
+function updatePkgCount(name, val) {
+  pkgCounts[name] = Math.max(0, val || 0);
+  const res = document.getElementById('pkgres-' + name);
+  if (res) res.textContent = pkgCounts[name] * pkgSizes[name] + 'un';
+  refreshRow(name);
+}
+
+function renderAll() {
+  renderList(TRADICIONAIS, 'list-trad');
+  renderList(ARRETADOS, 'list-arre');
+  renderPkgs();
+}
+
+// ── TABS ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('page-' + tab.dataset.page).classList.add('active');
+  });
+});
+
+// ── COPY ──
+function copyStock() {
+  let t = `ESTOQUE DE ESPETOS:\n${fmtDate()}\nTradicionais:\n`;
+  TRADICIONAIS.forEach(n => { t += `•${n} ${total(n)}un\n`; });
+  t += `Arretados:\n`;
+  ARRETADOS.forEach(n => { t += `•${n} ${total(n)}un\n`; });
+  navigator.clipboard.writeText(t.trim()).then(() => {
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Copiado! ✓';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }).catch(() => {
+    // fallback for older mobile browsers
+    const ta = document.createElement('textarea');
+    ta.value = t.trim();
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Copiado! ✓';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+// ── RESET ──
+function resetAll() {
+  if (!confirm('Zerar todos os contadores?')) return;
+  ALL.forEach(n => { units[n] = 0; pkgCounts[n] = 0; });
+  renderAll();
+}
+
+// ── INIT ──
+renderAll();
+</script>
+</body>
+</html>

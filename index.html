@@ -32,39 +32,39 @@
   .section-label{font-size:10px;font-weight:600;color:#E8642A;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #2d2d2d}
 
   /* ── ESPETO ROW ── */
-  .espeto-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid #252525}
-  .espeto-name{font-size:13px;color:#ccc;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:4px}
+  .espeto-row{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 0;border-bottom:0.5px solid #252525;min-height:46px;max-width:100%;overflow:hidden}
+  .espeto-name{font-size:14px;color:#ccc;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:0}
   .has-pkg .espeto-name{color:#E8A070}
-  .counter-wrap{display:flex;align-items:center;gap:2px;flex-shrink:0}
-  .cval{min-width:28px;text-align:center;font-size:13px;font-weight:600;color:#f0ede8;background:#2a2a2a;border-radius:4px;padding:1px 4px}
-  .cbtn{width:30px;height:30px;border:none;border-radius:4px;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none}
+  .counter-wrap{display:grid;grid-template-columns:34px minmax(32px,auto) 34px;align-items:center;gap:0;flex:0 0 auto;background:#252525;border-radius:10px;padding:2px;overflow:hidden}
+  .cval{min-width:32px;text-align:center;font-size:14px;font-weight:700;color:#f0ede8;background:transparent;border-radius:0;padding:6px 5px}
+  .cbtn{width:34px;height:34px;border:none;border-radius:8px;font-size:19px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;box-shadow:none}
   .cbtn-m{background:#2d2d2d;color:#aaa}
   .cbtn-p{background:#E8642A;color:#fff}
   .cbtn:active{transform:scale(0.88)}
 
   /* pkg badge inline */
-  .pkg-badge{font-size:9px;color:#777;margin-left:2px;white-space:nowrap}
+  .pkg-badge{font-size:10px;color:#777;margin-left:0;white-space:nowrap}
 
   /* ── PACOTES PAGE ── */
   #page-pacotes .intro{font-size:12px;color:#666;margin-bottom:10px;line-height:1.5}
-  .pkg-card{background:#222;border-radius:8px;padding:8px 10px;margin-bottom:8px;border:0.5px solid #2d2d2d}
-  .pkg-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-  .pkg-espeto-name{font-size:13px;font-weight:500;color:#f0ede8}
-  .pkg-toggle{font-size:11px;color:#E8642A;background:none;border:none;cursor:pointer;padding:0}
-  .pkg-fields{display:flex;align-items:center;gap:6px}
-  .pkg-field-group{display:flex;flex-direction:column;gap:2px}
+  .pkg-card{background:#222;border-radius:8px;padding:10px 12px;margin-bottom:10px;border:0.5px solid #2d2d2d}
+  .pkg-card-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .pkg-espeto-name{font-size:14px;font-weight:500;color:#f0ede8}
+  .pkg-toggle{font-size:12px;font-weight:700;color:#E8642A;background:#2a2a2a;border:none;border-radius:8px;cursor:pointer;padding:9px 12px;min-height:38px}
+  .pkg-fields{display:flex;align-items:center;gap:8px}
+  .pkg-field-group{display:flex;flex-direction:column;gap:4px}
   .pkg-field-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.5px}
-  .pkg-input{background:#2d2d2d;border:none;color:#f0ede8;border-radius:5px;padding:4px 6px;font-size:13px;width:52px;text-align:center;-webkit-appearance:none}
+  .pkg-input{background:#2d2d2d;border:none;color:#f0ede8;border-radius:8px;padding:9px 8px;font-size:15px;width:64px;min-height:40px;text-align:center;-webkit-appearance:none}
   .pkg-input:focus{outline:1px solid #E8642A}
   .pkg-eq{font-size:12px;color:#555;align-self:center;margin-top:12px}
   .pkg-result{font-size:13px;font-weight:600;color:#E8A070;align-self:center;margin-top:12px}
   .pkg-disabled{opacity:0.4}
 
   /* ── BOTTOM BAR ── */
-  #bottom-bar{padding:8px 12px;background:#111;border-top:1px solid #222;flex-shrink:0;display:flex;gap:8px}
-  .btn-copy{flex:1;background:#E8642A;border:none;color:#fff;font-size:13px;font-weight:600;border-radius:8px;padding:11px;cursor:pointer;letter-spacing:0.3px}
+  #bottom-bar{padding:10px 12px;background:#111;border-top:1px solid #222;flex-shrink:0;display:flex;gap:10px}
+  .btn-copy{flex:1;background:#E8642A;border:none;color:#fff;font-size:15px;font-weight:700;border-radius:10px;padding:14px 12px;cursor:pointer;letter-spacing:0.3px;min-height:48px}
   .btn-copy:active{transform:scale(0.97);background:#cc5520}
-  .btn-reset{background:#2a2a2a;border:none;color:#888;font-size:13px;font-weight:500;border-radius:8px;padding:11px 14px;cursor:pointer}
+  .btn-reset{background:#2a2a2a;border:none;color:#aaa;font-size:14px;font-weight:600;border-radius:10px;padding:14px 16px;cursor:pointer;min-height:48px}
   .btn-reset:active{transform:scale(0.97)}
 
   /* ── TOAST ── */
@@ -78,6 +78,18 @@
 
   @media (min-width:620px){
     #page-estoque .cols{grid-template-columns:1fr 1fr;gap:8px}
+  }
+
+  @media (max-width:420px){
+    .has-pkg{flex-wrap:wrap;justify-content:flex-end;padding:8px 0}
+    .has-pkg .espeto-name{flex-basis:100%;font-size:13px}
+    .has-pkg .counter-wrap{margin-left:0!important;margin-right:0!important}
+    .pkg-badge{margin-right:auto}
+    .pkg-fields{display:grid;grid-template-columns:1fr 1fr;align-items:end}
+    .pkg-field-group{min-width:0}
+    .pkg-input{width:100%}
+    .pkg-eq{display:none}
+    .pkg-result{grid-column:2;justify-self:end;margin-top:0}
   }
 </style>
 </head>

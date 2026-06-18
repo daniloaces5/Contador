@@ -18,17 +18,17 @@
   .tab.active{color:#E8642A;border-bottom:2px solid #E8642A}
 
   /* ── LAYOUT ── */
-  #shell{display:flex;flex-direction:column;height:100vh}
+  #shell{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0}
   .header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#111;flex-shrink:0;border-bottom:1px solid #222}
   .header-title{font-size:15px;font-weight:600;color:#E8642A;letter-spacing:0.3px}
   .header-date{font-size:12px;color:#666}
 
   /* ── PAGES ── */
-  .page{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px}
+  .page{display:none;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px}
   .page.active{display:block}
 
-  /* ── ESTOQUE PAGE: 2 col grid ── */
-  #page-estoque .cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  /* ── ESTOQUE PAGE ── */
+  #page-estoque .cols{display:grid;grid-template-columns:1fr;gap:12px}
   .section-label{font-size:10px;font-weight:600;color:#E8642A;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #2d2d2d}
 
   /* ── ESPETO ROW ── */
@@ -75,6 +75,10 @@
   .page::-webkit-scrollbar{width:3px}
   .page::-webkit-scrollbar-track{background:transparent}
   .page::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+
+  @media (min-width:620px){
+    #page-estoque .cols{grid-template-columns:1fr 1fr;gap:8px}
+  }
 </style>
 </head>
 <body>
@@ -135,6 +139,7 @@ let units = {};      // name -> manual unit count
 let pkgCounts = {};  // name -> package count
 let pkgSizes = {};   // name -> units per package (0 = disabled)
 let pkgEnabled = {}; // name -> bool
+const STORAGE_KEY = 'estoque-espetos-pacotes-v1';
 
 const ALL = [...TRADICIONAIS, ...ARRETADOS];
 ALL.forEach(n => {
@@ -143,6 +148,27 @@ ALL.forEach(n => {
   pkgSizes[n] = 6;
   pkgEnabled[n] = false;
 });
+
+function loadPkgState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    ALL.forEach(n => {
+      if (Number.isFinite(+saved.pkgCounts?.[n])) pkgCounts[n] = Math.max(0, +saved.pkgCounts[n]);
+      if (Number.isFinite(+saved.pkgSizes?.[n])) pkgSizes[n] = Math.max(1, +saved.pkgSizes[n]);
+      if (typeof saved.pkgEnabled?.[n] === 'boolean') pkgEnabled[n] = saved.pkgEnabled[n];
+    });
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
+function savePkgState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    pkgCounts,
+    pkgSizes,
+    pkgEnabled
+  }));
+}
 
 // Date
 function fmtDate() {
@@ -201,6 +227,7 @@ function changeUnit(name, d) {
 
 function changePkg(name, d) {
   pkgCounts[name] = Math.max(0, pkgCounts[name] + d);
+  savePkgState();
   refreshRow(name);
 }
 
@@ -228,13 +255,13 @@ function renderPkgs() {
         <div class="pkg-field-group">
           <span class="pkg-field-label">Tamanho do pacote</span>
           <input class="pkg-input" type="number" min="1" value="${pkgSizes[name]}"
-            onchange="updatePkgSize('${name}',+this.value)" id="psize-${name}">
+            oninput="updatePkgSize('${name}',+this.value)" id="psize-${name}">
         </div>
         <span class="pkg-eq">un/pkg</span>
         <div class="pkg-field-group" style="margin-left:10px">
           <span class="pkg-field-label">Pacotes</span>
           <input class="pkg-input" type="number" min="0" value="${pkgCounts[name]}"
-            onchange="updatePkgCount('${name}',+this.value)" id="pcount-${name}">
+            oninput="updatePkgCount('${name}',+this.value)" id="pcount-${name}">
         </div>
         <span class="pkg-eq">=</span>
         <span class="pkg-result" id="pkgres-${name}">${pkgCounts[name]*pkgSizes[name]}un</span>
@@ -246,11 +273,13 @@ function renderPkgs() {
 function togglePkg(name) {
   pkgEnabled[name] = !pkgEnabled[name];
   if (!pkgEnabled[name]) pkgCounts[name] = 0;
+  savePkgState();
   renderAll();
 }
 
 function updatePkgSize(name, val) {
   pkgSizes[name] = Math.max(1, val || 1);
+  savePkgState();
   const res = document.getElementById('pkgres-' + name);
   if (res) res.textContent = pkgCounts[name] * pkgSizes[name] + 'un';
   refreshRow(name);
@@ -258,6 +287,7 @@ function updatePkgSize(name, val) {
 
 function updatePkgCount(name, val) {
   pkgCounts[name] = Math.max(0, val || 0);
+  savePkgState();
   const res = document.getElementById('pkgres-' + name);
   if (res) res.textContent = pkgCounts[name] * pkgSizes[name] + 'un';
   refreshRow(name);
@@ -310,10 +340,12 @@ function copyStock() {
 function resetAll() {
   if (!confirm('Zerar todos os contadores?')) return;
   ALL.forEach(n => { units[n] = 0; pkgCounts[n] = 0; });
+  savePkgState();
   renderAll();
 }
 
 // ── INIT ──
+loadPkgState();
 renderAll();
 </script>
 </body>

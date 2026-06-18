@@ -35,9 +35,9 @@
   .espeto-row{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 0;border-bottom:0.5px solid #252525;min-height:46px;max-width:100%;overflow:hidden}
   .espeto-name{font-size:14px;color:#ccc;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:0}
   .has-pkg .espeto-name{color:#E8A070}
-  .counter-wrap{display:grid;grid-template-columns:34px minmax(32px,auto) 34px;align-items:center;gap:0;flex:0 0 auto;background:#252525;border-radius:10px;padding:2px;overflow:hidden}
-  .cval{min-width:32px;text-align:center;font-size:14px;font-weight:700;color:#f0ede8;background:transparent;border-radius:0;padding:6px 5px}
-  .cbtn{width:34px;height:34px;border:none;border-radius:8px;font-size:19px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;box-shadow:none}
+  .counter-wrap{display:grid;grid-template-columns:38px minmax(34px,auto) 38px;align-items:center;gap:0;flex:0 0 auto;background:#252525;border-radius:12px;padding:2px;overflow:hidden}
+  .cval{min-width:34px;text-align:center;font-size:15px;font-weight:700;color:#f0ede8;background:transparent;border-radius:0;padding:7px 5px}
+  .cbtn{width:38px;height:38px;border:none;border-radius:10px;font-size:21px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;box-shadow:none}
   .cbtn-m{background:#2d2d2d;color:#aaa}
   .cbtn-p{background:#E8642A;color:#fff}
   .cbtn:active{transform:scale(0.88)}
@@ -80,11 +80,15 @@
     #page-estoque .cols{grid-template-columns:1fr 1fr;gap:8px}
   }
 
+  @media (max-width:620px){
+    .espeto-row{flex-wrap:wrap;justify-content:flex-end;gap:5px 6px;padding:8px 0}
+    .espeto-name{flex-basis:100%;font-size:13px}
+    .counter-wrap{margin-left:0!important;margin-right:0!important}
+    .has-pkg .counter-wrap:first-of-type{order:3}
+    .pkg-badge{order:2}
+  }
+
   @media (max-width:420px){
-    .has-pkg{flex-wrap:wrap;justify-content:flex-end;padding:8px 0}
-    .has-pkg .espeto-name{flex-basis:100%;font-size:13px}
-    .has-pkg .counter-wrap{margin-left:0!important;margin-right:0!important}
-    .pkg-badge{margin-right:auto}
     .pkg-fields{display:grid;grid-template-columns:1fr 1fr;align-items:end}
     .pkg-field-group{min-width:0}
     .pkg-input{width:100%}

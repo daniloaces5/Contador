@@ -311,11 +311,19 @@ document.querySelectorAll('.tab').forEach(tab => {
 
 // ── COPY ──
 function copyStock() {
-  let t = `ESTOQUE DE ESPETOS:\n${fmtDate()}\nTradicionais:\n`;
-  TRADICIONAIS.forEach(n => { t += `•${n} ${total(n)}un\n`; });
-  t += `Arretados:\n`;
-  ARRETADOS.forEach(n => { t += `•${n} ${total(n)}un\n`; });
-  navigator.clipboard.writeText(t.trim()).then(() => {
+  const formatSection = arr => arr.map(n => `•${n} ${total(n)}un`).join('\n');
+  const t = `*ESTOQUE DE ESPETOS:*
+${fmtDate()}
+
+*Tradicionais:*
+
+${formatSection(TRADICIONAIS)}
+
+*Arretados:*
+
+${formatSection(ARRETADOS)}`;
+
+  navigator.clipboard.writeText(t).then(() => {
     const toast = document.getElementById('toast');
     toast.textContent = 'Copiado! ✓';
     toast.classList.add('show');
@@ -323,7 +331,7 @@ function copyStock() {
   }).catch(() => {
     // fallback for older mobile browsers
     const ta = document.createElement('textarea');
-    ta.value = t.trim();
+    ta.value = t;
     ta.style.position = 'fixed'; ta.style.opacity = '0';
     document.body.appendChild(ta);
     ta.focus(); ta.select();

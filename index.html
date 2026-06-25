@@ -169,6 +169,7 @@ function loadPkgState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
     ALL.forEach(n => {
+      if (Number.isFinite(+saved.units?.[n])) units[n] = Math.max(0, +saved.units[n]);
       if (Number.isFinite(+saved.pkgCounts?.[n])) pkgCounts[n] = Math.max(0, +saved.pkgCounts[n]);
       if (Number.isFinite(+saved.pkgSizes?.[n])) pkgSizes[n] = Math.max(1, +saved.pkgSizes[n]);
       if (typeof saved.pkgEnabled?.[n] === 'boolean') pkgEnabled[n] = saved.pkgEnabled[n];
@@ -180,6 +181,7 @@ function loadPkgState() {
 
 function savePkgState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    units,
     pkgCounts,
     pkgSizes,
     pkgEnabled
@@ -238,6 +240,7 @@ function renderList(arr, containerId) {
 
 function changeUnit(name, d) {
   units[name] = Math.max(0, units[name] + d);
+  savePkgState();
   refreshRow(name);
 }
 
